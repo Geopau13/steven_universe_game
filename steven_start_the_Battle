@@ -1,0 +1,130 @@
+import pygame
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Set up the game window
+window_width = 800
+window_height = 600
+window = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption("Steven Universe Game")
+clock = pygame.time.Clock()
+
+# Define colors
+MAIN_COLORS = [
+    (218, 247, 166),
+    (255, 195, 0),
+    (255, 87, 51),
+    (199, 0, 57),
+    (144, 12, 63),
+    (88, 24, 69)
+]
+COLOR_INDEX = 0
+
+# Load Steven's image
+steven_image = pygame.image.load("steven.png")
+steven_image = pygame.transform.scale(steven_image, (100, 100))  # Resize the image
+
+# Define font
+font = pygame.font.Font(None, 36)
+
+# Define the villains and their powers
+villains = {
+    'Blue Diamond': 100,
+    'White Diamond': 300,
+    'Yellow Diamond': 200
+}
+
+# Define the player
+player = 'Steven'
+super_powers = {
+    'happiness': 110,
+    'patience': 210,
+    'kindness': 310
+}
+
+# Game state variables
+defeated_villains = []
+
+# Flag to track if the battle is over
+battle_over = False
+
+# Game loop
+running = True
+while running:
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        # Handle keypress events
+        if event.type == pygame.KEYDOWN and not battle_over:
+            if event.key == pygame.K_1:
+                # Attack using happiness power
+                if 'happiness' in super_powers and 'Blue Diamond' in villains and super_powers['happiness'] >= villains['Blue Diamond']:
+                    defeated_villains.append('Blue Diamond')
+                    del super_powers['happiness']
+                    del villains['Blue Diamond']
+
+            elif event.key == pygame.K_2:
+                # Attack using patience power
+                if 'patience' in super_powers and 'Yellow Diamond' in villains and super_powers['patience'] >= villains['Yellow Diamond']:
+                    defeated_villains.append('Yellow Diamond')
+                    del super_powers['patience']
+                    del villains['Yellow Diamond']
+
+            elif event.key == pygame.K_3:
+                # Attack using kindness power
+                if 'kindness' in super_powers and 'White Diamond' in villains and super_powers['kindness'] >= villains['White Diamond']:
+                    defeated_villains.append('White Diamond')
+                    del super_powers['kindness']
+                    del villains['White Diamond']
+
+    # Set the window's main color
+    window.fill(MAIN_COLORS[COLOR_INDEX])
+
+    if not battle_over:
+        # Display the options to the player
+        text = font.render("Choose your action:", True, (0, 0, 0))
+        window.blit(text, (10, 10))
+
+        text = font.render("1. Attack (happiness)", True, (0, 0, 0))
+        window.blit(text, (10, 50))
+
+        text = font.render("2. Attack (patience)", True, (0, 0, 0))
+        window.blit(text, (10, 90))
+
+        text = font.render("3. Attack (kindness)", True, (0, 0, 0))
+        window.blit(text, (10, 130))
+
+        # Display Steven's image
+        window.blit(steven_image, (window_width // 2 - 50, window_height - 120))
+
+    else:
+        # Display battle result
+        text = font.render("Battle Over!", True, (0, 0, 0))
+        window.blit(text, (10, 10))
+
+        text = font.render("Defeated villains:", True, (0, 0, 0))
+        window.blit(text, (10, 50))
+        for i, villain in enumerate(defeated_villains):
+            text = font.render(villain, True, (0, 0, 0))
+            window.blit(text, (10, 90 + i * 40))
+
+    # Update the display
+    pygame.display.flip()
+
+    # Check if all villains are defeated or no super powers left
+    if len(villains) == 0 or len(super_powers) == 0:
+        battle_over = True
+
+    # Limit the frame rate
+    clock.tick(60)
+
+    # Change the main color after a certain number of frames
+    if pygame.time.get_ticks() % 300 == 0:
+        COLOR_INDEX = (COLOR_INDEX + 1) % len(MAIN_COLORS)
+
+# Quit Pygame
+pygame.quit()
